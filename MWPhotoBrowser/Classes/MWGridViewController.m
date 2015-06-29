@@ -26,7 +26,7 @@
     if ((self = [super initWithCollectionViewLayout:[PSTCollectionViewFlowLayout new]])) {
         
         // Defaults
-        _columns = 3, _columnsL = 4;
+        _columns = 2, _columnsL = 4;
         _margin = 0, _gutter = 1;
         _marginL = 0, _gutterL = 1;
         
@@ -34,18 +34,18 @@
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
             // iPad
             _columns = 6, _columnsL = 8;
-            _margin = 1, _gutter = 2;
-            _marginL = 1, _gutterL = 2;
+            _margin = 10, _gutter = 10;
+            _marginL = 10, _gutterL = 10;
         } else if ([UIScreen mainScreen].bounds.size.height == 480) {
             // iPhone 3.5 inch
-            _columns = 3, _columnsL = 4;
-            _margin = 0, _gutter = 1;
-            _marginL = 1, _gutterL = 2;
+            _columns = 2, _columnsL = 4;
+            _margin = 10, _gutter = 10;
+            _marginL = 10, _gutterL = 10;
         } else {
             // iPhone 4 inch
-            _columns = 3, _columnsL = 5;
-            _margin = 0, _gutter = 1;
-            _marginL = 0, _gutterL = 2;
+            _columns = 2, _columnsL = 5;
+            _margin = 10, _gutter = 10;
+            _marginL = 10, _gutterL = 10;
         }
 
         _initialContentOffset = CGPointMake(0, CGFLOAT_MAX);
@@ -60,7 +60,7 @@
     [super viewDidLoad];
     [self.collectionView registerClass:[MWGridCell class] forCellWithReuseIdentifier:@"GridCell"];
     self.collectionView.alwaysBounceVertical = YES;
-    self.collectionView.backgroundColor = [UIColor blackColor];
+    self.collectionView.backgroundColor = [UIColor clearColor];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

@@ -49,6 +49,9 @@
 
 - (void)_initialisation {
     
+        _navtint = [UIColor colorWithRed:0.49 green:0.6 blue:0.76 alpha:1];
+        _bgcolor = [UIColor colorWithRed:0.42 green:0.49 blue:0.6 alpha:1];
+    
     // Defaults
     NSNumber *isVCBasedStatusBarAppearanceNum = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIViewControllerBasedStatusBarAppearance"];
     if (isVCBasedStatusBarAppearanceNum) {
@@ -81,6 +84,16 @@
     _thumbPhotos = [[NSMutableArray alloc] init];
     _currentGridContentOffset = CGPointMake(0, CGFLOAT_MAX);
     _didSavePreviousStateOfNavBar = NO;
+    
+        if (SYSTEM_VERSION_LESS_THAN(@"7")) {
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                _statusBarStyle = UIStatusBarStyleBlackTranslucent;
+        #pragma clang diagnostic push
+        } else {
+                    _statusBarStyle = UIStatusBarStyleLightContent;
+        }
+    
     if ([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]){
         self.automaticallyAdjustsScrollViewInsets = NO;
     }
@@ -132,6 +145,7 @@
 	
 }
 
+
 #pragma mark - View Loading
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
@@ -145,9 +159,9 @@
     if (!_enableGrid) _startOnGrid = NO;
 	
 	// View
-	self.view.backgroundColor = [UIColor blackColor];
+	self.view.backgroundColor = _bgcolor;
     self.view.clipsToBounds = YES;
-	
+    
 	// Setup paging scrolling view
 	CGRect pagingScrollViewFrame = [self frameForPagingScrollView];
 	_pagingScrollView = [[UIScrollView alloc] initWithFrame:pagingScrollViewFrame];
@@ -163,14 +177,16 @@
     // Toolbar
     _toolbar = [[UIToolbar alloc] initWithFrame:[self frameForToolbarAtOrientation:self.interfaceOrientation]];
     _toolbar.tintColor = SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7") ? [UIColor whiteColor] : nil;
-    if ([_toolbar respondsToSelector:@selector(setBarTintColor:)]) {
-        _toolbar.barTintColor = nil;
-    }
+//    if ([_toolbar respondsToSelector:@selector(setBarTintColor:)]) {
+//        _toolbar.barTintColor = nil;
+//    }
     if ([[UIToolbar class] respondsToSelector:@selector(appearance)]) {
-        [_toolbar setBackgroundImage:nil forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-        [_toolbar setBackgroundImage:nil forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsLandscapePhone];
+//        [_toolbar setBackgroundImage:nil forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
+//        [_toolbar setBackgroundImage:nil forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsLandscapePhone];
+
+        [_toolbar setBarTintColor:_navtint];
     }
-    _toolbar.barStyle = UIBarStyleBlackTranslucent;
+    _toolbar.barStyle = UIBarStyleDefault;
     _toolbar.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     
     // Toolbar Items
@@ -364,14 +380,7 @@
 #endif
     if (!_leaveStatusBarAlone && fullScreen && UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
         _previousStatusBarStyle = [[UIApplication sharedApplication] statusBarStyle];
-        if (SYSTEM_VERSION_LESS_THAN(@"7")) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:animated];
-#pragma clang diagnostic push
-        } else {
-            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:animated];
-        }
+        [[UIApplication sharedApplication] setStatusBarStyle:_statusBarStyle animated:animated];
     }
     
     // Navigation bar appearance
@@ -444,6 +453,7 @@
 #pragma mark - Nav Bar Appearance
 
 - (void)setNavBarAppearance:(BOOL)animated {
+    
     [self.navigationController setNavigationBarHidden:NO animated:animated];
     UINavigationBar *navBar = self.navigationController.navigationBar;
     navBar.tintColor = SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7") ? [UIColor whiteColor] : nil;
@@ -452,8 +462,10 @@
         navBar.shadowImage = nil;
     }
     navBar.translucent = YES;
-    navBar.barStyle = UIBarStyleBlackTranslucent;
+    navBar.barTintColor = _navtint;
+    
     if ([[UINavigationBar class] respondsToSelector:@selector(appearance)]) {
+    
         [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
         [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsLandscapePhone];
     }
@@ -1152,7 +1164,7 @@
     _gridController.selectionMode = _displaySelectionButtons;
     _gridController.view.frame = self.view.bounds;
     _gridController.view.frame = CGRectOffset(_gridController.view.frame, 0, (self.startOnGrid ? -1 : 1) * self.view.bounds.size.height);
-
+    _gridController.view.backgroundColor = _bgcolor;
     // Stop specific layout being triggered
     _skipNextPagingScrollViewPositioning = YES;
     
@@ -1661,5 +1673,7 @@
     }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+
+
 
 @end
